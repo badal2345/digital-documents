@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Digital Documents
 
-## Getting Started
+A responsive Next.js App Router application for secure, legally authorized digital-document workflows. The Aadhaar-related experience creates only a permanently watermarked **SAMPLE – NOT A VALID ID** demo and intentionally excludes UIDAI artwork, QR codes, signatures, holograms, and security features.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Next.js 16, TypeScript, Tailwind CSS, Supabase Auth/Postgres/SSR, React Hook Form, Zod, and Lucide icons.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies: `npm install`
+2. Copy `.env.example` to `.env.local` and add the Supabase project URL and publishable key.
+3. In Supabase Dashboard, enable **Email** authentication and configure your confirmation-email settings.
+4. Run `supabase/migrations/20260817000000_initial_schema.sql` in the Supabase SQL editor.
+5. Start the app: `npm run dev`
+6. Open `http://localhost:3000`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The committed `.env.local` contains the publishable key supplied for this project. Never add a service-role or secret key to a `NEXT_PUBLIC_` variable.
 
-## Learn More
+## Authentication notes
 
-To learn more about Next.js, take a look at the following resources:
+Registration uses Supabase email + password auth. The mobile number remains required and is stored as profile metadata through a database trigger, with duplicate numbers prevented by the profile constraint. Dashboard access is checked in both the session-refresh proxy and the server layout using `auth.getUser()`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Data and security
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+All public tables use RLS and ownership checks against `auth.uid()`. Users receive read-only direct access to wallet, transaction, and generated-document rows. Document generation calls `generate_demo_document`, an authenticated atomic database function that locks credit deduction and record creation into one transaction and refuses negative balances.
 
-## Deploy on Vercel
+## Seed/testing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Each newly registered user automatically receives a profile, wallet, and 100 welcome credits. This is deterministic seed data for testing without bypassing RLS. For SMS testing, configure test OTPs in Supabase Auth settings or use your configured provider.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Structure
+
+- `src/app/(auth routes)` – login, registration, recovery
+- `src/app/dashboard` – protected overview and modules
+- `src/components` – shared auth and application shell
+- `src/utils/supabase` – browser, server, and session-refresh clients
+- `supabase/migrations` – schema, triggers, grants, RLS, atomic RPC

@@ -1,0 +1,25 @@
+.editor { color:#111; }
+.page { container-type:inline-size; position:relative; width:min(100%,816px); aspect-ratio:816/1056; margin-inline:auto; overflow:hidden; background:#fff; box-shadow:0 5px 25px #0003; }
+.background { object-fit:fill; z-index:0; }
+.field { position:absolute; z-index:2; min-width:2.95%; padding:.12% .36%; background:#fff; line-height:1.15; white-space:pre-wrap; }
+.placeholder { color:#64748b; font-style:italic; }
+.center { text-align:center; }
+.title { left:56.37%; top:1.99%; width:5.39%; font-size:1.47cqw; }
+.datetime { left:3.80%; top:1.99%; width:15.32%; font-size:1.35cqw; }
+.enrollment { left:16.80%; top:32.01%; width:28.80%; font-size:1.47cqw; }
+.toName { left:15%; top:34%; width:15.32%; font-size:1.47cqw; padding-bottom:.5%; }
+.addressTop { left:15.44%; top:36.84%; width:32.84%; min-height:3.60%; font-size:1.23cqw; }
+.downloadLeft { left:8.82%; top:33.5%; width:3.5%; height:11.66%; font-size:1.10cqw; white-space:nowrap; writing-mode:vertical-rl; rotate:0deg; transform-origin:center; }
+.issueLeft { left:9.5%; top:46.08%; width:2.21%; height:9.52%; font-size:1.1cqw; white-space:nowrap; writing-mode:vertical-rl; rotate:none; transform-origin:center; }
+.numberMain { left:19.36%; top:62.31%; width:27.21%; font-size:2.57cqw; font-weight:700; letter-spacing:.04em; }
+.photoWrap { position:absolute; z-index:3; left:11.27%; top:74.53%; width:8.33%; height:7.95%; overflow:hidden; }
+.photoWrap img { width:100%; height:100%; object-fit:cover; display:block; }
+.nameCard { left:20.96%; top:74.43%; width:16.54%; font-size:1.47cqw; }
+.dob { left:20.96%; top:77.08%; width:18.87%; font-size:1.23cqw; }
+.gender { left:20.96%; top:78.41%; width:12.87%; font-size:1.23cqw; }
+.downloadCard { left:9%; top:74.53%; min-width:7px; height:10%; font-size:.98cqw; white-space:nowrap; writing-mode:vertical-rl; transform:rotate(0deg); }
+.issueCard { left:45.47%; top:74.53%; width:2.21%; height:7.77%; font-size:.98cqw; white-space:nowrap; writing-mode:vertical-rl; rotate:0deg; transform-origin:center; }
+.numberCardLeft { left:17.22%; top:86.36%; width:25.74%; font-size:2.21cqw; font-weight:700; }
+.nameAddressRight { left:51.84%; top:74.15%; width:25.12%; min-height:6.53%; font-size:1.10cqw; }
+.numberCardRight { left:61.73%; top:86.36%; width:23.77%; font-size:2.21cqw; font-weight:700; }
+@media print { .page { width:816px; height:1056px; box-shadow:none; } }

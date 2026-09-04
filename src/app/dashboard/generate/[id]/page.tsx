@@ -5,6 +5,9 @@ import EditableDocument from "./EditableDocument";
 type Details = {
   aadhaarNumber?: string;
   guardianName?: string;
+  guardianRelation?: string;
+  hindiGuardianRelation?: string;
+  hindiGuardianName?: string;
   fullName?: string;
   houseNo?: string;
   locality?: string;
@@ -14,6 +17,7 @@ type Details = {
   pincode?: string;
   dob?: string;
   gender?: string;
+  hindiGender?: string;
   language?: string;
   enrollmentNumber?: string;
   hindiAddress?: string;

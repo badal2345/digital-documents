@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, FilePlus2, ReceiptIndianRupee, Sparkles, WalletCards } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
+import { AddCreditDialog } from "@/components/add-credit-dialog";
 
 export default async function Dashboard() {
   const supabase = await createClient();
@@ -49,7 +50,7 @@ export default async function Dashboard() {
         <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-white/10" />
         <div className="relative flex h-full min-h-52 flex-col justify-between">
           <div className="flex items-start justify-between"><div><p className="text-sm font-semibold text-indigo-100">Remaining amount</p><p className="mt-2 text-4xl font-black">₹{remainingAmount.toLocaleString("en-IN")}</p></div><span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/15"><ReceiptIndianRupee className="h-6 w-6" /></span></div>
-          <div className="mt-8 flex items-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-sm text-indigo-50"><Sparkles className="h-4 w-4" />Enough for {availableCredits.toLocaleString("en-IN")} generations</div>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-sm text-indigo-50"><Sparkles className="h-4 w-4" />Enough for {availableCredits.toLocaleString("en-IN")} generations</div><AddCreditDialog /></div>
         </div>
       </article>
     </section>

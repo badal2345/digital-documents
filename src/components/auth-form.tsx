@@ -8,21 +8,21 @@ import { z } from "zod";
 import { createClient } from "@/utils/supabase/client";
 import { ArrowRight, FileCheck2, Loader2, ShieldCheck } from "lucide-react";
 
-const phoneRule = /^\+91[6-9]\d{9}$/;
+const phoneRule = /^[6-9]\d{9}$/;
 const loginSchema = z.object({ email:z.email("Enter a valid email address"), password:z.string().min(8,"Password must be at least 8 characters"), remember:z.boolean().optional() });
-const registerSchema = loginSchema.extend({ phone:z.string().regex(phoneRule,"Use +91 followed by a valid 10-digit mobile number"), fullName:z.string().min(2,"Enter your full name"), confirm:z.string(), terms:z.literal(true,{error:"Please accept the terms"}) }).refine(v=>v.password===v.confirm,{path:["confirm"],message:"Passwords do not match"});
+const registerSchema = loginSchema.extend({ phone:z.string().regex(phoneRule,"Enter a valid 10-digit mobile number"), fullName:z.string().min(2,"Enter your full name"), confirm:z.string(), terms:z.literal(true,{error:"Please accept the terms"}) }).refine(v=>v.password===v.confirm,{path:["confirm"],message:"Passwords do not match"});
 type Values = z.infer<typeof registerSchema>;
 
 export function AuthForm({ mode }:{ mode:"login"|"register" }) {
   const router = useRouter();
   const schema = mode === "register" ? registerSchema : loginSchema;
-  const { register, handleSubmit, formState:{ errors, isSubmitting } } = useForm<Values>({ resolver:zodResolver(schema) as never, defaultValues:{phone:"+91",remember:true} });
+  const { register, handleSubmit, formState:{ errors, isSubmitting } } = useForm<Values>({ resolver:zodResolver(schema) as never, defaultValues:{phone:"",remember:true} });
   const [serverError,setServerError]=useState("");
   async function submit(values:Values) {
     setServerError(""); const supabase=createClient();
     const result = mode === "login"
       ? await supabase.auth.signInWithPassword({email:values.email,password:values.password})
-      : await supabase.auth.signUp({email:values.email,password:values.password,options:{data:{full_name:values.fullName,phone_number:values.phone}}});
+      : await supabase.auth.signUp({email:values.email,password:values.password,options:{data:{full_name:values.fullName,phone_number:`+91${values.phone}`}}});
     if(result.error) return setServerError(result.error.message);
     router.replace("/dashboard"); router.refresh();
   }
@@ -38,10 +38,10 @@ export function AuthForm({ mode }:{ mode:"login"|"register" }) {
       <p className="text-sm font-bold uppercase tracking-[.18em] text-indigo-600">{mode === "login" ? "Welcome back" : "Create account"}</p>
       <h2 className="mt-2 text-3xl font-bold">{mode === "login" ? "Sign in to continue" : "Start your secure workspace"}</h2>
       <p className="mt-2 text-slate-500">{mode === "login" ? "Enter your registered email and password." : "A few details and you’ll be ready to go."}</p>
-      <form onSubmit={handleSubmit(submit)} className="mt-8 space-y-5">
-        {mode === "register" && <Field label="Full name" error={errors.fullName?.message}><input className="field" placeholder="Anjali Sharma" {...register("fullName")}/></Field>}
-        <Field label="Email address" error={errors.email?.message}><input className="field" type="email" inputMode="email" autoComplete="email" placeholder="anjali@example.com" {...register("email")}/></Field>
-        {mode === "register" && <Field label="Mobile number" error={errors.phone?.message}><input className="field" type="tel" inputMode="tel" autoComplete="tel" placeholder="+919876543210" {...register("phone")}/></Field>}
+      <form onSubmit={handleSubmit(submit)} className="mt-8 flex flex-col gap-6">
+        {mode === "register" && <Field label="Full name" error={errors.fullName?.message}><input className="field" placeholder="Rajesh Kumar" autoComplete="name" {...register("fullName")}/></Field>}
+        <Field label="Email address" error={errors.email?.message}><input className="field" type="email" inputMode="email" autoComplete="email" placeholder="rajesh@example.com" {...register("email")}/></Field>
+        {mode === "register" && <Field label="Mobile number" error={errors.phone?.message}><input className="field" type="tel" inputMode="numeric" autoComplete="tel" placeholder="9876543210" maxLength={10} {...register("phone")} onInput={event=>{event.currentTarget.value=event.currentTarget.value.replace(/\D/g,"").slice(0,10)}}/></Field>}
         <Field label="Password" error={errors.password?.message}><input className="field" type="password" placeholder="Minimum 8 characters" {...register("password")}/></Field>
         {mode === "register" && <Field label="Confirm password" error={errors.confirm?.message}><input className="field" type="password" placeholder="Repeat password" {...register("confirm")}/></Field>}
         <div className="flex items-center justify-between text-sm"><label className="flex gap-2 text-slate-600"><input type="checkbox" {...register(mode === "login" ? "remember" : "terms")}/>{mode === "login" ? "Remember me" : "I agree to the Terms & Conditions"}</label>{mode === "login" && <Link href="/forgot-password" className="font-bold text-indigo-600">Forgot password?</Link>}</div>
@@ -52,4 +52,4 @@ export function AuthForm({ mode }:{ mode:"login"|"register" }) {
     </div></section>
   </main>;
 }
-function Field({label,error,children}:{label:string;error?:string;children:React.ReactNode}) { return <label><span className="label">{label}</span>{children}{error&&<span className="error">{error}</span>}</label> }
+function Field({label,error,children}:{label:string;error?:string;children:React.ReactNode}) { return <label className="block"><span className="label">{label}</span>{children}{error&&<span className="error block">{error}</span>}</label> }

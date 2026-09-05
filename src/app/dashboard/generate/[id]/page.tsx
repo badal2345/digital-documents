@@ -10,10 +10,17 @@ type Details = {
   hindiGuardianName?: string;
   fullName?: string;
   houseNo?: string;
+  hindiHouseNo?: string;
   locality?: string;
+  hindiLocality?: string;
+  policeStation?: string;
+  hindiPoliceStation?: string;
   postOffice?: string;
+  hindiPostOffice?: string;
   city?: string;
+  hindiCity?: string;
   state?: string;
+  hindiState?: string;
   pincode?: string;
   dob?: string;
   gender?: string;
@@ -40,12 +47,16 @@ export default async function GeneratedIdDetails({ params }: { params: Promise<{
   const { data: signedPhoto } = document.document_url
     ? await supabase.storage.from("id-profile-pictures").createSignedUrl(document.document_url, 600)
     : { data: null };
-  const address = [details.houseNo, details.locality, details.postOffice, details.city, details.state, details.pincode].filter(Boolean).join(", ");
+  const policeStation = details.policeStation ? `Police Station: ${details.policeStation}` : "";
+  const hindiPoliceStation = details.hindiPoliceStation ? `थाना: ${details.hindiPoliceStation}` : "";
+  const address = [details.houseNo, details.locality, policeStation, details.postOffice, details.city, details.state, details.pincode].filter(Boolean).join(", ");
+  const hindiAddress = [details.hindiHouseNo, details.hindiLocality, hindiPoliceStation, details.hindiPostOffice, details.hindiCity, details.hindiState, details.pincode].filter(Boolean).join(", ") || details.hindiAddress;
 
   return <div className="mx-auto max-w-5xl">
     <div className="mb-8"><EditableDocument data={{
       ...details,
       address,
+      hindiAddress,
       createdAt: document.created_at,
       enrollmentNumber: details.enrollmentNumber || enrollmentFromId(document.id),
     }} photoUrl={signedPhoto?.signedUrl} /></div>

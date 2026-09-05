@@ -21,18 +21,18 @@ export default function EditableDocument({ data, photoUrl }: { data:EditableDocu
   const [downloading,setDownloading]=useState(false);
   const [downloadError,setDownloadError]=useState("");
   const name=[data.hindiName,data.fullName].filter(Boolean).join("\n");
-  const cardName=[data.hindiName,data.fullName].filter(Boolean).join("  ");
+  const cardName=[data.hindiName,data.fullName].filter(Boolean).join("\n");
   const downloadDate=formatDate(data.createdAt);
   const issueDate=formatDate(data.issueDate ?? data.createdAt);
   const dob=formatDate(data.dob);
   const relation=data.guardianRelation ?? "Guardian";
-  const relationLabel=relation === "Father" ? "S/O or D/O" : relation === "Husband" ? "W/O" : "C/O";
+  const relationLabel=relation === "Father" ? (data.gender === "Female" ? "D/O" : "S/O") : relation === "Husband" ? "W/O" : "C/O";
   const hindiRelationLabel=data.hindiGuardianRelation ?? (relation === "Father" ? "पिता" : relation === "Husband" ? "पति" : "अभिभावक");
   const relative=data.guardianName ? `${relationLabel}: ${data.guardianName}` : "";
   const hindiRelative=data.hindiGuardianName ? `${hindiRelationLabel}: ${data.hindiGuardianName}` : "";
   const address=[relative,data.address].filter(Boolean).join(", ");
   const hindiAddress=[hindiRelative,data.hindiAddress].filter(Boolean).join(", ");
-  const bilingualAddress=hindiAddress ? <><strong>पता:</strong><br/>{hindiAddress}<br/><br/><strong>Address:</strong><br/>{address}</> : address ? <><strong>Address:</strong><br/>{address}</> : "";
+  const bilingualAddress=hindiAddress ? <><strong>पता:</strong><br/>{hindiAddress}<br/><strong>Address:</strong><br/>{address}</> : address ? <><strong>Address:</strong><br/>{address}</> : "";
   const aadhaar=formatAadhaar(data.aadhaarNumber);
 
   async function downloadPdf(){

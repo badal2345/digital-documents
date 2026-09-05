@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useRef, useState } from "react";
+import { Download, Loader2 } from "lucide-react";
 import styles from "./EditableDocument.module.css";
 
 export type EditableDocumentData = {
@@ -15,6 +17,9 @@ function Field({ children, className, placeholder }: { children?:React.ReactNode
 }
 
 export default function EditableDocument({ data, photoUrl }: { data:EditableDocumentData; photoUrl?:string }) {
+  const documentRef=useRef<HTMLElement>(null);
+  const [downloading,setDownloading]=useState(false);
+  const [downloadError,setDownloadError]=useState("");
   const name=[data.hindiName,data.fullName].filter(Boolean).join("\n");
   const cardName=[data.hindiName,data.fullName].filter(Boolean).join("  ");
   const downloadDate=formatDate(data.createdAt);
@@ -30,7 +35,30 @@ export default function EditableDocument({ data, photoUrl }: { data:EditableDocu
   const bilingualAddress=hindiAddress ? <><strong>पता:</strong><br/>{hindiAddress}<br/><br/><strong>Address:</strong><br/>{address}</> : address ? <><strong>Address:</strong><br/>{address}</> : "";
   const aadhaar=formatAadhaar(data.aadhaarNumber);
 
-  return <div className={styles.editor}><main className={styles.page}>
+  async function downloadPdf(){
+    if(!documentRef.current||downloading)return;
+    setDownloading(true);setDownloadError("");
+    try{
+      await document.fonts.ready;
+      const [{toPng},{jsPDF}]=await Promise.all([import("html-to-image"),import("jspdf")]);
+      const image=await toPng(documentRef.current,{pixelRatio:2,cacheBust:true,backgroundColor:"#ffffff"});
+      const pdf=new jsPDF({orientation:"portrait",unit:"px",format:[816,1056],hotfixes:["px_scaling"]});
+      pdf.addImage(image,"PNG",0,0,816,1056,undefined,"FAST");
+      const filename=`${(data.fullName||"document").trim().replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").toLowerCase()||"document"}.pdf`;
+      pdf.save(filename);
+    }catch{
+      setDownloadError("Could not create the PDF. Please try again.");
+    }finally{
+      setDownloading(false);
+    }
+  }
+
+  return <div className={styles.editor}>
+    <div className="mb-4 flex flex-wrap items-center justify-end gap-3">
+      {downloadError&&<p className="text-sm text-red-600" role="alert">{downloadError}</p>}
+      <button type="button" className="btn btn-primary" onClick={downloadPdf} disabled={downloading}>{downloading?<Loader2 className="h-5 w-5 animate-spin"/>:<Download className="h-5 w-5"/>}{downloading?"Creating PDF…":"Download PDF"}</button>
+    </div>
+    <main ref={documentRef} className={styles.page}>
     <Image className={styles.background} src="/testing-page.png" alt="Aadhaar document template" fill sizes="(max-width:816px) 100vw, 816px" priority/>
     <Field className={styles.datetime} placeholder="Document date">{downloadDate}</Field>
     <Field className={`${styles.title} ${styles.center}`} placeholder="Document type">PDF</Field>
@@ -51,7 +79,8 @@ export default function EditableDocument({ data, photoUrl }: { data:EditableDocu
     <Field className={`${styles.numberCardLeft} ${styles.center}`} placeholder="Aadhaar number">{aadhaar}</Field>
     <Field className={styles.nameAddressRight} placeholder="Address">{bilingualAddress}</Field>
     <Field className={`${styles.numberCardRight} ${styles.center}`} placeholder="Aadhaar number">{aadhaar}</Field>
-  </main></div>;
+    </main>
+  </div>;
 }
 
 function formatAadhaar(value?:string) { return value?.replace(/\s/g,"").replace(/(\d{4})(?=\d)/g,"$1 ") ?? ""; }
